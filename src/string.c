@@ -56,26 +56,38 @@ AGC_TRY:
     *ctx = tmp;
 
 AGC_CATCH:
-    agc_erno_set (AGC_ERNO_STRING);
-
 AGC_FINALLY:
     return agc_erno_get ();
 }
 
 
+static inline const aga_string *
+str_sanitise(const aga_string *s)
+{
+    return s ? s : "(null)";
+}
+
+
+static inline const aga_string *
+str_sanitise_2(const aga_string **s)
+{
+    return s && *s ? *s : "(null)";
+}
 
 
 extern agc_erno
 aga_string_new(aga_string **ctx, const char *cstr)
 {
 AGC_TRY:
-    agc_assert_string (cstr);
+    agc_assert_handle (cstr);
 
     const agc_size sz = strlen (cstr) + NULLCHAR_OFFSET;
     agc_try (agm_mpool_alloc ((void **) ctx, sz));
     (void) strncpy (*ctx, cstr, sz);
 
 AGC_CATCH:
+    agm_log_erno ();
+    agm_log_error ("failed to create string \'%s\'", str_sanitise (cstr));
     agc_erno_set (AGC_ERNO_STRING);
 
 AGC_FINALLY:
@@ -96,6 +108,9 @@ AGC_TRY:
     *len = utf8_strlen (ctx);
 
 AGC_CATCH:
+    agm_log_erno ();
+    agm_log_error ("failed to get length of string \'%s\'",
+                   str_sanitise_2 (ctx));
     agc_erno_set (AGC_ERNO_STRING);
 
 AGC_FINALLY:
@@ -112,6 +127,8 @@ AGC_TRY:
     *sz = strlen (ctx) + NULLCHAR_OFFSET;
 
 AGC_CATCH:
+    agm_log_erno ();
+    agm_log_error ("failed to get size of string \'%s\'", str_sanitise (ctx));
     agc_erno_set (AGC_ERNO_STRING);
 
 AGC_FINALLY:
@@ -128,6 +145,9 @@ AGC_TRY:
     *cmp = strcmp (ctx, rhs);
 
 AGC_CATCH:
+    agm_log_erno ();
+    agm_log_error ("failed to compare string \'%s\' with \'%s\'",
+                   str_sanitise (ctx), str_sanitise (rhs));
     agc_erno_set (AGC_ERNO_STRING);
 
 AGC_FINALLY:
@@ -136,7 +156,7 @@ AGC_FINALLY:
 
 
 extern agc_erno
-aga_string_add(const aga_string **ctx, const aga_string *add)
+aga_string_add(aga_string **ctx, const aga_string *add)
 {
 AGC_TRY:
     agc_assert_handle (ctx && *ctx && add);
@@ -151,6 +171,9 @@ AGC_TRY:
     *ctx = strncat (cat, add, rlen);
 
 AGC_CATCH:
+    agm_log_erno ();
+    agm_log_error ("failed to add string \'%s\' to \'%s\'", str_sanitise (add),
+                   str_sanitise_2 (*ctx));
     agc_erno_set (AGC_ERNO_STRING);
 
 AGC_FINALLY:
@@ -169,10 +192,13 @@ AGC_TRY:
     *loc = sub ? (utf8_strlen (ctx) - utf8_strlen (sub) + offset) : 0;
 
 AGC_CATCH:
-        agc_erno_set (AGC_ERNO_STRING);
+    agm_log_erno ();
+    agm_log_error ("failed to find string \'%s\' in \'%s\')",
+                   str_sanitise (ctx), str_sanitise (what));
+    agc_erno_set (AGC_ERNO_STRING);
 
 AGC_FINALLY:
-        return agc_erno_get ();
+    return agc_erno_get ();
 }
 
 
@@ -201,6 +227,10 @@ AGC_TRY:
         agc_try (replace_first (ctx, placeholder, with));
 
 AGC_CATCH:
+    agm_log_erno ();
+    agm_log_error ("failed to replace string \'%s\' in \'%s\' with \'%s\'",
+                   str_sanitise (what), str_sanitise_2 (*ctx),
+                   str_sanitise (with));
     agc_erno_set (AGC_ERNO_STRING);
 
 AGC_FINALLY:
@@ -216,12 +246,6 @@ AGC_TRY:
     agc_assert_handle (ctx && *ctx && what && with);
 
     return replace_first (ctx, what, with);
-
-AGC_CATCH:
-    agc_erno_set (AGC_ERNO_STRING);
-
-AGC_FINALLY:
-    return agc_erno_get ();
 }
 
 

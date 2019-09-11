@@ -33,7 +33,7 @@ aga_string_cmp(const aga_string *ctx, const aga_string *rhs, int *cmp);
 
 
 extern agc_erno
-aga_string_add(const aga_string **ctx, const aga_string *add);
+aga_string_add(aga_string **ctx, const aga_string *add);
 
 
 extern agc_erno
