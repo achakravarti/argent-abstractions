@@ -153,7 +153,7 @@ aga_string_sz(const aga_string *ctx, size_t *sz);
  * @note The lexicographical comparison is case sensitive, so "HELLO" < "hello".
  */
 extern agc_erno
-aga_string_cmp(const aga_string *lhs, const aga_string *rhs, int *cmp);
+aga_string_cmp(const aga_string *lhs, const aga_string *rhs, agc_int *cmp);
 
 
 /**
@@ -192,7 +192,7 @@ aga_string_add(aga_string **ctx, const aga_string *add);
  * @return AGC_ERNO_STRING if unsuccessful.
  */
 extern agc_erno
-aga_string_find(const aga_string *ctx, const aga_string *what, size_t *loc);
+aga_string_find(const aga_string *ctx, const aga_string *what, agc_index *loc);
 
 
 /**

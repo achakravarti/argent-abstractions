@@ -4,7 +4,7 @@
 
 
     /* size offset for terminating null character */
-#define NULLCHAR_OFFSET 1
+#define NULLCHAR_OFFSET ((ag_size) 1)
 
 
     /* checks if a character is a UTF-8 continuation character */
@@ -181,7 +181,7 @@ AGC_FINALLY:
 
     /* implement aga_string_cmp() interface function */
 extern agc_erno
-aga_string_cmp(const aga_string *lhs, const aga_string *rhs, int *cmp)
+aga_string_cmp(const aga_string *lhs, const aga_string *rhs, agc_int *cmp)
 {
 AGC_TRY:
         /* check preconditions */
@@ -212,7 +212,7 @@ aga_string_add(aga_string **ctx, const aga_string *add)
 
 AGC_TRY:
         /* check preconditions */
-    agc_assert_handle (ctx && *ctx && add);
+    agc_assert_handle (ctx && && add);
 
         /* determine sizes of @p ctx and @p add */
     lsz = strlen (*ctx) + NULLCHAR_OFFSET;
@@ -222,8 +222,10 @@ AGC_TRY:
     cat = NULL;
     agc_try (agm_mpool_alloc ((void **) &cat, lsz + rsz));
 
-        /* concatenate @p ctx and @p add */
-    (void) strncpy (cat, *ctx, lsz);
+        /* concatenate @p ctx and @p add; @p ctx may be a handle to an
+         * uninitialised string buffer */
+    if (*ctx)
+        (void) strncpy (cat, *ctx, lsz);
     *ctx = strncat (cat, add, rsz);
 
 AGC_CATCH:
@@ -241,7 +243,7 @@ AGC_FINALLY:
 
     /* implement aga_string_find() interface function */
 extern agc_erno
-aga_string_find(const aga_string *ctx, const aga_string *what, size_t *loc)
+aga_string_find(const aga_string *ctx, const aga_string *what, agc_index *loc)
 {
     const agc_size offset = 1;
     const aga_string *sub;
