@@ -137,17 +137,17 @@ AGC_FINALLY:
 
 
 extern agc_erno
-aga_string_cmp(const aga_string *ctx, const aga_string *rhs, int *cmp)
+aga_string_cmp(const aga_string *lhs, const aga_string *rhs, int *cmp)
 {
 AGC_TRY:
-    agc_assert_handle (ctx && rhs && cmp);
+    agc_assert_handle (lhs && rhs && cmp);
 
-    *cmp = strcmp (ctx, rhs);
+    *cmp = strcmp (lhs, rhs);
 
 AGC_CATCH:
     agm_log_erno ();
     agm_log_error ("failed to compare string \'%s\' with \'%s\'",
-                   str_sanitise (ctx), str_sanitise (rhs));
+                   str_sanitise (lhs), str_sanitise (rhs));
     agc_erno_set (AGC_ERNO_STRING);
 
 AGC_FINALLY:
